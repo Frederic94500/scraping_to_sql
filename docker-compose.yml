@@ -1,0 +1,5 @@
+version: "latest"
+services:
+  scrap:
+    build: .
+    restart: "unless-stopped"
