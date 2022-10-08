@@ -1,14 +1,10 @@
-FROM python:3
+FROM python:slim
 
 WORKDIR /usr/src/app
 
-COPY requirements.txt ./
-
-RUN curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
-RUN apt update
-RUN apt install libmariadb3 -y
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt update && apt install -y curl && curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash && apt update && apt install libmariadb3 libmariadb-dev gcc -y && apt clean
 
 COPY . .
+RUN pip install --no-cache-dir -r requirements.txt
 
 CMD [ "python", "./main.py" ]
