@@ -53,6 +53,7 @@ class Solar:
             self.commit_entry_total_inverter(connection, cursor, timestamp, temp_total)
         except (ConnectionError, ValueError) as e:
             if 4 <= int(datetime.now(timezone.utc).strftime('%H')) < 20:
+                instant_inverter_power = self.latest_power
                 is_zero = False
             else:
                 print(e)

@@ -47,10 +47,10 @@ if __name__ == '__main__':
                 total += total_inv
             if instant > 0:
                 cursor.execute("INSERT INTO inst (timestamp, power) VALUES (?,?)", (timestamp, instant))
-            if daily != 0 and daily > max_daily:
+            if daily != 0 and daily >= max_daily:
                 max_daily = daily
                 cursor.execute("INSERT INTO daily (timestamp, power) VALUES (?,?)", (timestamp, daily))
-            if total != 0 and total > max_total:
+            if total != 0 and total >= max_total:
                 max_total = total
                 cursor.execute("INSERT INTO total (timestamp, power) VALUES (?,?)", (timestamp, total))
             connection.commit()
