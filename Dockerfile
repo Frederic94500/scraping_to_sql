@@ -2,9 +2,16 @@ FROM python:slim
 
 WORKDIR /usr/src/app
 
-RUN apt update && apt install -y curl && curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash && apt update && apt install libmariadb3 libmariadb-dev gcc -y && apt clean
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash && \
+    apt-get update && \
+    apt-get install libmariadb3 libmariadb-dev gcc -y && \
+    apt-get clean
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
-RUN pip install --no-cache-dir -r requirements.txt
 
 CMD [ "python", "./main.py" ]

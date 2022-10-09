@@ -31,8 +31,10 @@ if __name__ == '__main__':
     for (total_c,) in cursor:
         max_total = total_c
 
-    counter_zero, max_daily, reset = 0, 0, 0
-    while True:
+    counter_zero, max_daily = 0, 0
+    start_time = time.time()
+    current_time = time.time()
+    while (current_time - start_time) <= 7200:
         instant, daily, total = 0, 0, 0
         if counter_zero < 6 and 4 <= int(datetime.now(timezone.utc).strftime('%H')) < 20:
             timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
@@ -55,12 +57,11 @@ if __name__ == '__main__':
                 cursor.execute("INSERT INTO total (timestamp, power) VALUES (?,?)", (timestamp, total))
             connection.commit()
             time.sleep(30)
-            reset += 30
-        elif reset >= 7200:
-            cursor.close()
-            connection.close()
-            sys.exit(0)
         else:
             time.sleep(600)
             max_daily, counter_zero = 0, 0
-            reset += 600
+        current_time = time.time()
+
+    cursor.close()
+    connection.close()
+    sys.exit(0)
