@@ -40,10 +40,7 @@ class Solar:
             connection.commit()
 
     def get_information(self, connection, cursor, timestamp):
-        is_zero = False
-        instant_inverter_power = 0
-        temp_daily = 0
-        temp_total = 0
+        instant_inverter_power, temp_daily, temp_total = 0, 0, 0
         try:
             data = self.scraper()
             self.latest_power = int(data[5][23:-1])
@@ -51,14 +48,11 @@ class Solar:
             temp_daily = float(data[6][25:-1])
             temp_total = float(data[7][25:-1])
             self.commit_entry_total_inverter(connection, cursor, timestamp, temp_total)
-        except (ConnectionError, ValueError) as e:
+        except (ConnectionError, ValueError):
             if 4 <= int(datetime.now(timezone.utc).strftime('%H')) < 20:
                 instant_inverter_power = self.latest_power
-                is_zero = False
             else:
-                print(e)
                 instant_inverter_power, self.latest_power = 0, 0
-                is_zero = True
         finally:
             self.commit_entry_instant_inverter_power(connection, cursor, timestamp, instant_inverter_power)
-            return is_zero, self.latest_power, temp_daily, temp_total
+            return self.latest_power, temp_daily, temp_total

@@ -31,19 +31,15 @@ if __name__ == '__main__':
     for (total_c,) in cursor:
         max_total = total_c
 
-    counter_zero, max_daily = 0, 0
+    max_daily = 0
     start_time = time.time()
     current_time = time.time()
     while (current_time - start_time) <= 7200:
         instant, daily, total = 0, 0, 0
-        if counter_zero < 6 and 4 <= int(datetime.now(timezone.utc).strftime('%H')) < 20:
+        if 4 <= int(datetime.now(timezone.utc).strftime('%H')) < 20:
             timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
             for inverter in inverters:
-                is_zero, instant_inv, daily_inv, total_inv = inverter.get_information(connection, cursor, timestamp)
-                if is_zero:
-                    counter_zero += 1
-                else:
-                    counter_zero = 0
+                instant_inv, daily_inv, total_inv = inverter.get_information(connection, cursor, timestamp)
                 instant += instant_inv
                 daily += daily_inv
                 total += total_inv
@@ -59,7 +55,7 @@ if __name__ == '__main__':
             time.sleep(30)
         else:
             time.sleep(600)
-            max_daily, counter_zero = 0, 0
+            max_daily = 0
         current_time = time.time()
 
     cursor.close()
