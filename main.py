@@ -15,6 +15,7 @@ if __name__ == '__main__':
             password="-",
             database="solar"
         )
+        connection.autocommit(True)
         cursor = connection.cursor()
     except mariadb.Error as e:
         print(f"Error connecting to MariaDB Platform: {e}")
@@ -51,7 +52,6 @@ if __name__ == '__main__':
             if total != 0 and total >= max_total:
                 max_total = total
                 cursor.execute("INSERT INTO total (timestamp, power) VALUES (?,?)", (timestamp, total))
-            connection.commit()
             time.sleep(30)
         else:
             time.sleep(600)

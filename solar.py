@@ -23,12 +23,11 @@ class Solar:
                 socket.herror, socket.timeout) as e:
             raise ConnectionError()
 
-    def commit_entry_instant_inverter_power(self, connection, cursor, timestamp, power):
+    def commit_entry_instant_inverter_power(self, cursor, timestamp, power):
         temp_inverter_instant = self.INVERTER_NO + "_inst"
         cursor.execute(f"INSERT INTO {temp_inverter_instant} (timestamp, power) VALUES (?,?)", (timestamp, power))
-        connection.commit()
 
-    def commit_entry_total_inverter(self, connection, cursor, timestamp, total):
+    def commit_entry_total_inverter(self, cursor, timestamp, total):
         temp_inverter_total = self.INVERTER_NO + "_total"
         temp_total = 0.0
         cursor.execute(f"SELECT power FROM {temp_inverter_total} ORDER BY timestamp DESC LIMIT 1;")
@@ -37,9 +36,8 @@ class Solar:
 
         if temp_total < total:
             cursor.execute(f"INSERT INTO {temp_inverter_total} (timestamp, power) VALUES (?,?)", (timestamp, total))
-            connection.commit()
 
-    def get_information(self, connection, cursor, timestamp):
+    def get_information(self, cursor, timestamp):
         instant_inverter_power, temp_daily, temp_total = 0, 0, 0
         try:
             data = self.scraper()
@@ -47,12 +45,12 @@ class Solar:
             instant_inverter_power = int(data[5][23:-1])
             temp_daily = float(data[6][25:-1])
             temp_total = float(data[7][25:-1])
-            self.commit_entry_total_inverter(connection, cursor, timestamp, temp_total)
+            self.commit_entry_total_inverter(cursor, timestamp, temp_total)
         except (ConnectionError, ValueError):
             if 4 <= int(datetime.now(timezone.utc).strftime('%H')) < 20:
                 instant_inverter_power = self.latest_power
             else:
                 instant_inverter_power, self.latest_power = 0, 0
         finally:
-            self.commit_entry_instant_inverter_power(connection, cursor, timestamp, instant_inverter_power)
+            self.commit_entry_instant_inverter_power(cursor, timestamp, instant_inverter_power)
             return self.latest_power, temp_daily, temp_total
