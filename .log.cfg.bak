@@ -1,0 +1,10 @@
+[MARIADB]
+host =
+port =
+user =
+password =
+database =
+
+[SOLAR]
+user =
+password =

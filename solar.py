@@ -1,4 +1,5 @@
 import socket
+from configparser import ConfigParser
 from datetime import timezone, datetime
 
 import requests
@@ -8,19 +9,21 @@ from bs4 import BeautifulSoup as Bs
 class Solar:
     INVERTER_NO = ""
     ADDRESS = ""
+    CFG = ConfigParser()
     latest_power = 0
 
-    def __init__(self, inverter_no, address):
+    def __init__(self, inverter_no, address, cfg):
         self.INVERTER_NO = inverter_no
         self.ADDRESS = address
+        self.CFG = cfg
 
     def scraper(self):
         try:  # Password here
-            soup = Bs(requests.get(self.ADDRESS, auth=("admin", "-")).content, "lxml")
+            soup = Bs(requests.get(self.ADDRESS, auth=(self.CFG["SOLAR"]["user"], self.CFG["SOLAR"]["password"])).content, "lxml")
             data = soup.find_all('script')[1].text.strip().split(";")
             return data
         except (ConnectionError, requests.exceptions.ConnectionError, socket.error, socket.gaierror,
-                socket.herror, socket.timeout) as e:
+                socket.herror, socket.timeout):
             raise ConnectionError()
 
     def commit_entry_instant_inverter_power(self, cursor, timestamp, power):
