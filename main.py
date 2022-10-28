@@ -14,12 +14,12 @@ if __name__ == '__main__':
     try:
         connection = mariadb.connect(
             host=cfg["MARIADB"]["host"],
-            port=cfg["MARIADB"]["port"],
+            port=int(cfg["MARIADB"]["port"]),
             user=cfg["MARIADB"]["user"],
             password=cfg["MARIADB"]["password"],
             database=cfg["MARIADB"]["database"]
         )
-        connection.autocommit(True)
+        connection.autocommit = True
         cursor = connection.cursor()
     except mariadb.Error as e:
         print(f"Error connecting to MariaDB Platform: {e}")
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     max_daily = 0
     start_time = time.time()
     current_time = time.time()
-    while (current_time - start_time) <= 7200 and connection.open():
+    while (current_time - start_time) <= 7200 and connection.open:
         instant, daily, total = 0, 0, 0
         if 4 <= int(datetime.now(timezone.utc).strftime('%H')) < 20:
             timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
