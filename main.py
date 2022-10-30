@@ -32,9 +32,7 @@ if __name__ == '__main__':
     ]
 
     cursor.execute("SELECT power FROM total ORDER BY timestamp DESC LIMIT 1;")
-    max_total = 0
-    for (total_c,) in cursor:
-        max_total = total_c
+    (max_total, ) = cursor.fetchone()
 
     max_daily = 0
     start_time = time.time()

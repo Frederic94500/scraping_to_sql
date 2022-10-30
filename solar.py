@@ -32,10 +32,8 @@ class Solar:
 
     def commit_entry_total_inverter(self, cursor, timestamp, total):
         temp_inverter_total = self.INVERTER_NO + "_total"
-        temp_total = 0.0
         cursor.execute(f"SELECT power FROM {temp_inverter_total} ORDER BY timestamp DESC LIMIT 1;")
-        for (total_c,) in cursor:
-            temp_total = total_c
+        (temp_total, ) = cursor.fetchone()
 
         if temp_total < total:
             cursor.execute(f"INSERT INTO {temp_inverter_total} (timestamp, power) VALUES (?,?)", (timestamp, total))
