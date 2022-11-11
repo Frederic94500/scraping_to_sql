@@ -35,9 +35,7 @@ if __name__ == '__main__':
     (max_total, ) = cursor.fetchone()
 
     max_daily = 0
-    start_time = time.time()
-    current_time = time.time()
-    while (current_time - start_time) <= 7200 and connection.open:
+    while connection.open:
         instant, daily, total = 0, 0, 0
         if 4 <= int(datetime.now(timezone.utc).strftime('%H')) < 20:
             timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
@@ -58,7 +56,6 @@ if __name__ == '__main__':
         else:
             time.sleep(600)
             max_daily = 0
-        current_time = time.time()
 
     cursor.close()
     connection.close()
