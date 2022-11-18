@@ -20,6 +20,7 @@ if __name__ == '__main__':
             database=cfg["MARIADB"]["database"]
         )
         connection.autocommit = True
+        connection.auto_reconnect = True
         cursor = connection.cursor()
     except mariadb.Error as e:
         print(f"Error connecting to MariaDB Platform: {e}")
