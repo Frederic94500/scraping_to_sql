@@ -4,8 +4,15 @@ from configparser import ConfigParser
 from datetime import timezone, datetime
 
 import mariadb as mariadb
+import requests
 
 from solar import Solar
+
+
+def get_sunrise_sunset(lat, lng):
+    data = requests.get(f"https://api.sunrise-sunset.org/json?lat={lat}&lng={lng}&formatted=0").json()
+    return datetime.fromisoformat(data["results"]["sunrise"]), datetime.fromisoformat(data["results"]["sunset"])
+
 
 if __name__ == '__main__':
     cfg = ConfigParser()
@@ -33,12 +40,14 @@ if __name__ == '__main__':
     ]
 
     cursor.execute("SELECT power FROM total ORDER BY timestamp DESC LIMIT 1;")
-    (max_total, ) = cursor.fetchone()
+    (max_total,) = cursor.fetchone()
 
+    sunrise, sunset = get_sunrise_sunset(cfg["COORDS"]["lat"], cfg["COORDS"]["lng"])
     max_daily = 0
+
     while connection.open:
         instant, daily, total = 0, 0, 0
-        if 4 <= int(datetime.now(timezone.utc).strftime('%H')) < 20:
+        if sunrise <= datetime.now(timezone.utc) <= sunset:
             timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
             for inverter in inverters:
                 instant_inv, daily_inv, total_inv = inverter.get_information(cursor, timestamp)
@@ -56,6 +65,7 @@ if __name__ == '__main__':
             time.sleep(30)
         else:
             time.sleep(600)
+            sunrise, sunset = get_sunrise_sunset(cfg["COORDS"]["lat"], cfg["COORDS"]["lng"])
             max_daily = 0
 
     cursor.close()

@@ -8,3 +8,7 @@ database =
 [SOLAR]
 user =
 password =
+
+[COORDS]
+lat =
+lng =
