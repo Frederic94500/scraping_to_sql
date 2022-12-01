@@ -55,7 +55,7 @@ if __name__ == '__main__':
                 daily += daily_inv
                 total += total_inv
             if instant > 0:
-                cursor.execute("INSERT INTO inst (timestamp, power) VALUES (?,?)", (timestamp, instant))
+                cursor.execute("INSERT INTO instant (timestamp, power) VALUES (?,?)", (timestamp, instant))
             if daily != 0 and daily >= max_daily:
                 max_daily = daily
                 cursor.execute("INSERT INTO daily (timestamp, power) VALUES (?,?)", (timestamp, daily))

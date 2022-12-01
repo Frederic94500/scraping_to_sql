@@ -27,7 +27,7 @@ class Solar:
             raise ConnectionError()
 
     def commit_entry_instant_inverter_power(self, cursor, timestamp, power):
-        temp_inverter_instant = self.INVERTER_NO + "_inst"
+        temp_inverter_instant = self.INVERTER_NO + "_instant"
         cursor.execute(f"INSERT INTO {temp_inverter_instant} (timestamp, power) VALUES (?,?)", (timestamp, power))
 
     def commit_entry_total_inverter(self, cursor, timestamp, total):
