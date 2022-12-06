@@ -10,7 +10,7 @@ from solar import Solar
 
 
 def get_sunrise_sunset(lat, lng):
-    data = requests.get(f"https://api.sunrise-sunset.org/json?lat={lat}&lng={lng}&formatted=0").json()
+    data = requests.get(f"https://api.sunrise-sunset.org/json?lat={lat}&lng={lng}&formatted=0", timeout=10).json()
     return datetime.fromisoformat(data["results"]["sunrise"]), datetime.fromisoformat(data["results"]["sunset"])
 
 
@@ -56,14 +56,18 @@ if __name__ == '__main__':
                 total += total_inv
             if instant > 0:
                 cursor.execute("INSERT INTO instant (timestamp, power) VALUES (?,?)", (timestamp, instant))
+                print(timestamp + " - Instant committed")
             if daily != 0 and daily >= max_daily:
                 max_daily = daily
                 cursor.execute("INSERT INTO daily (timestamp, power) VALUES (?,?)", (timestamp, daily))
+                print(timestamp + " - Daily committed")
             if total != 0 and total >= max_total:
                 max_total = total
                 cursor.execute("INSERT INTO total (timestamp, power) VALUES (?,?)", (timestamp, total))
+                print(timestamp + " - Total committed")
             time.sleep(30)
         else:
+            print(datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S') + " - Pause...")
             time.sleep(600)
             sunrise, sunset = get_sunrise_sunset(cfg["COORDS"]["lat"], cfg["COORDS"]["lng"])
             max_daily = 0
